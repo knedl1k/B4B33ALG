@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS+=-std=c99 -Wall -Wextra -pedantic -g -lm -O3 -Werror -Wunused-variable
+CFLAGS+=-std=c99 -Wall -Wextra -pedantic -g -lm -O3 -Wunused-variable #-Werror
 LFLAGS+=-lpthread
 CFILES=main.c
 
-all: compile run tar
+all: clean compile
 
 compile:
 	$(CC) $(CFLAGS) $(CFILES) -o main $(LFLAGS)
