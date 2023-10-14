@@ -35,12 +35,12 @@ void pp(u16 N,u8 arr[N+1][N+1]);
 int main(){
    u16 N, K, L, S;
    scanf("%u %u %u %u", &N, &K, &L, &S);
-   u8 prefix[N+1][N+1];
+   //u8 prefix[N+1][N+1];
    u8 trees[N+1][N+1];
    u8 rocks[N+1][N+1];
    for(u16 i=0;i<(N+1);++i){
       for(u16 j=0;j<(N+1);++j){
-         prefix[i][j]=0;
+         //prefix[i][j]=0;
          trees[i][j]=0;
          rocks[i][j]=0;
       }
@@ -49,18 +49,17 @@ int main(){
    u8 item=0;
    for(u16 i=1; i<(N+1); ++i){
       for(u16 j=1; j<(N+1); ++j){
-         if(i==0) continue;
          scanf("%hhu",&item);
-         if(item==1){  //tree
-            trees[i][j]=1 +trees[i][j-1]+trees[i-1][j]-trees[i-1][j-1];
-				rocks[i][j]=0 +rocks[i][j-1]+rocks[i-1][j]-rocks[i-1][j-1];
+         
+         if(item==1){ //tree
+            trees[i][j]=1;
+            rocks[i][j]=0;
          }else if(item==2){ //rock
-            rocks[i][j]=1 +rocks[i][j-1]+rocks[i-1][j]-rocks[i-1][j-1];
-				trees[i][j]=0 +trees[i][j-1]+trees[i-1][j]-trees[i-1][j-1];
-         }else{
-            trees[i][j]=0 +trees[i][j-1]+trees[i-1][j]-trees[i-1][j-1];
-            rocks[i][j]=0 +rocks[i][j-1]+rocks[i-1][j]-rocks[i-1][j-1];
+            rocks[i][j]=1;
+            trees[i][j]=0;
          }
+         trees[i][j]+=trees[i][j-1]+trees[i-1][j]-trees[i-1][j-1];
+         rocks[i][j]+=rocks[i][j-1]+rocks[i-1][j]-rocks[i-1][j-1];
          
          //prefix[i][j]=prefix[i-1][j]+prefix[i][j-1]-prefix[i-1][j-1]+item;
       }
