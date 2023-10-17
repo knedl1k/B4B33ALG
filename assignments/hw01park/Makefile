@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS+=-std=c99 -Wall -Wextra -pedantic -g -lm -O3 -Wunused-variable #-Werror
+CFLAGS+=-std=c2x -Wall -Wextra -pedantic -g -lm -O3 -Wunused-variable #-Werror
 LFLAGS+=-lpthread
 CFILES=main.c
 
