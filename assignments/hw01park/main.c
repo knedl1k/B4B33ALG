@@ -5,27 +5,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 
-void pp(size_t N,size_t arr[N+1][N+1]);
+/**
+ * 1 ≤ N ≤ 3000
+ * 1 ≤ K ≤ N
+ * 0 ≤ 2*L < K
+ * 1 ≤ S ≤ 15000
+ */
 
 int main(){
-   size_t N, K, L, S;
-   scanf("%lu %lu %lu %lu", &N, &K, &L, &S);
-   size_t trees[N+1][N+1];
-   size_t rocks[N+1][N+1];
+   unsigned short int N,K,L,S;
+   scanf("%hu %hu %hu %hu", &N, &K, &L, &S);
+   
+   /* It won't fit on a stack. The allocation has to be dynamic, cuz data are stored on heap.
 
-   for(size_t i=0;i<(N+1);++i){
-      for(size_t j=0;j<(N+1);++j){
+   unsigned short int trees[N+1][N+1];
+   unsigned short int rocks[N+1][N+1];
+   
+   for(unsigned short int i=0;i<(N+1);++i){
+      for(unsigned short int j=0;j<(N+1);++j){
          trees[i][j]=0;
          rocks[i][j]=0;
       }
    }
-   
-   size_t item;
-   for(size_t i=1; i<(N+1); ++i){
-      for(size_t j=1; j<(N+1); ++j){
-         scanf("%lu",&item);
+   */
+
+   int **trees =(int **)calloc(N+1, sizeof(int *));
+   int **rocks =(int **)calloc(N+1, sizeof(int *));
+   /*
+   if(trees==NULL || rocks==NULL){
+      printf("Memory allocation failed. Exiting...");
+      exit(1);
+   }
+   */
+   for(int i = 0; i < N+1; ++i){
+      trees[i] =(int *)calloc(N+1, sizeof(int));
+      rocks[i] =(int *)calloc(N+1, sizeof(int));
+      /*
+      if(trees[i]==NULL || rocks[i]==NULL){
+         printf("Memory allocation failed. Exiting...");
+         exit(1);
+      }
+      */
+   }
+
+   for(unsigned short int i=1; i<(N+1); ++i){
+      for(unsigned short int j=1; j<(N+1); ++j){
+         unsigned char item;
+         scanf("%hhu",&item);
          if(item==1){ //tree
             trees[i][j]=1;
             rocks[i][j]=0;
@@ -39,16 +66,15 @@ int main(){
    }
 
    //subconstants for better optimalization
-   size_t k=K-1;
-   size_t l=L-1;
+   unsigned short int k=K-1;
+   unsigned short int l=L-1;
+   
+   unsigned int rock;
+   unsigned int tree,best_tree=0;
 
-   size_t rock=0;
-   size_t tree=0,best_tree=0;
-
-   for(size_t i=1; i<(N-K+2); ++i){
-      for(size_t j=1; j<(N-K+2); ++j){
+   for(unsigned short int i=1; i<(N-K+2); ++i){
+      for(unsigned short int j=1; j<(N-K+2); ++j){
          rock=rocks[i+k-L][j+k-L] +rocks[i+l][j+l] -rocks[i+l][j+k-L] -rocks[i+k-L][j+k];
-         //printf("%lu ",rock);
          if(rock>=S){ //number of rocks >= minimum needed
             tree=trees[i+k][j+k] +trees[i-1][j-1] -trees[i-1][j+k] -trees[i+k][j-1];
             if(tree>best_tree) best_tree=tree;
@@ -56,17 +82,15 @@ int main(){
       
       }
    }
-   printf("%lu",best_tree);
-   return EXIT_SUCCESS;
-}
+   printf("%u",best_tree);
 
-void pp(size_t N,size_t arr[N+1][N+1]){
-   printf("\n");
-   for(size_t i=0;i<(N+1);++i){
-      for(size_t j=0;j<(N+1);++j)
-         printf("%lu ",arr[i][j]);
-      printf("\n");
+   for(int i = 0; i < N+1; i++){
+      free(trees[i]);
+      free(rocks[i]);
    }
+   free(trees);
+   free(rocks);
+   return EXIT_SUCCESS;
 }
 
 /**
