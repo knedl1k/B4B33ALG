@@ -1,4 +1,6 @@
-#! /bin/bash
+#!/usr/bin/env bash
+#GNU General Public License v3.0
+#knedl1k 2023
 
 for i in {1..10}; do
    if [ "$i" -lt 10 ]; then
