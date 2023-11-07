@@ -3,23 +3,28 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
-#define u2 unsigned short
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 
-struct node{
-  u2 data;
-  struct node *left;
-  u2 price_left;
-  struct node *right;
-  u2 price_right;
-};
+typedef struct Node{
+  size_t value;
+  size_t price_left,price_right;
+  struct Node *left,*right;
+}Node_t;
 
-struct node* create(u2 value,u2 price_left,u2 price_right);
-struct node* insertRight(struct node* root,u2 value,u2 price_left,u2 price_right);
-struct node* insertLeft(struct node* root,u2 value,u2 price_left,u2 price_right);
+Node_t* create(size_t value);
+Node_t* createTree(size_t n,size_t topology[][3]);
 
-void free_tree(struct node* root);
 
-void preorderTraversal(struct node* root);
-void postorderTraversal(struct node* root);
+void preorderTraversal(Node_t* root);
+void postorderTraversal(Node_t* root);
+void inorderTraversal(Node_t* root);
+
+_Bool isBoxIn(Node_t *root);
+void placeBox(Node_t *root, size_t value);
+void removeBox(Node_t *root,size_t value);
+
+void free_tree(Node_t* root);
 
 #endif
