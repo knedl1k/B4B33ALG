@@ -8,81 +8,87 @@
 #include <stdbool.h>
 
 
-Node_t* create(size_t value){
+Node_t* create(int idx){
   Node_t *new_node=(Node_t *)malloc(sizeof(Node_t));
-  new_node->value=value;
-  new_node->left=NULL;
-  new_node->price_left=0;
-  new_node->right=NULL;
-  new_node->price_right=0;
+  new_node->idx=idx;
+  new_node->value=0,new_node->number_boxes=0;
+  new_node->left=NULL,new_node->right=NULL,new_node->parent=NULL;
+  new_node->price_left=0,new_node->price_right=0;
   return new_node;
-}
-/*
-Node_t* insertLeft(Node_t *root, size_t value){
-  root->left=create(value);
-  return root->left;
-}
-
-Node_t* insertRight(Node_t *root, size_t value){
-  root->right=create(value);
-  return root->right;
-}
-*/
-
-Node_t* createTree(size_t N, size_t topology[][3]){
-  Node_t *nodes[N];
-  for(size_t i=0;i<N;++i){
-    nodes[i]=create(i);
-  }
-  for(size_t i=0;i<N-1;++i){
-    size_t parent,child,price;
-    parent=topology[i][0];
-    child=topology[i][1];
-    price=topology[i][2];
-    if(nodes[parent]->left == NULL){
-      nodes[parent]->left=nodes[child];
-      nodes[parent]->price_left=price;
-
-    }else{
-      nodes[parent]->right=nodes[child];
-      nodes[parent]->price_right=price;
-    }
-  }
-  return nodes[0];
-}
-
-void preorderTraversal(Node_t *root){
-  if(root == NULL)return;
-  printf("%zu ->", root->value);
-  preorderTraversal(root->left);
-  preorderTraversal(root->right);
-}
-
-void postorderTraversal(Node_t *root){
-  if(root == NULL)return;
-  postorderTraversal(root->left);
-  postorderTraversal(root->right);
-  printf("%zu ->", root->value);
-}
-
-
-void inorderTraversal(Node_t* root){
-  if (root == NULL) return;
-  inorderTraversal(root->left);
-  printf("%zu ->", root->value);
-  inorderTraversal(root->right);
 }
 
 bool isBoxIn(Node_t *root){
-  return (root->value)? 1:0;
+  return (root->number_boxes)? 1:0;
 }
 
-void placeBox(Node_t *root,size_t value){
-  root->value=value;
+void placeBox(Node_t *root,int value){
+  root->value+=value;
+  root->number_boxes++;
 }
 
-void removeBox(Node_t *root,size_t value){
+void removeBox(Node_t *root,int value){
   root->value-=value;
+  root->number_boxes--;
+}
+
+static void postorderTraverse(Node_t *root,bool *correct_place){
+  if(root==NULL)return;
+  postorderTraverse(root->left,correct_place);
+  postorderTraverse(root->right,correct_place);
+  if(! isBoxIn(root))
+    *correct_place=false;
+}
+
+static bool checkPath(Node_t *node){
+  if(node->parent == NULL) //root
+    return node->number_boxes == 0 ? true : false;
+  
+  if(node->parent->number_boxes != 0) //non-root
+    return false;
+  
+  return checkPath(node->parent);
+}
+
+bool isPlaceOK(Node_t *root){
+  bool correct_place=true;
+  postorderTraverse(root->left,&correct_place);
+  postorderTraverse(root->right,&correct_place);
+  correct_place=checkPath(root);
+  return correct_place;
+}
+
+int calculateWeight(Node_t *node){
+  if(node==NULL)
+    return 0;
+
+  int left_diff=0, right_diff=0;
+
+  if(node->left!=NULL){
+    left_diff=abs(node->value - node->left->value);
+    left_diff+=calculateWeight(node->left);
+  }
+  if(node->right != NULL){
+    right_diff=abs(node->value - node->right->value);
+    right_diff+=calculateWeight(node->right);
+  }
+
+  return left_diff+right_diff;
+}
+
+int calculateTime(Node_t *node){
+  if (node == NULL) {
+    return 0;
+  }
+    
+  int time_left = (node->left != NULL) ? (node->left->number_boxes * node->price_left) : 0;
+  int time_right = (node->right != NULL) ? (node->right->number_boxes * node->price_right) : 0;
+    
+  int time_total = time_left + time_right;
+    
+  int time_sub_left = calculateTime(node->left);
+  int time_sub_right = calculateTime(node->right);
+
+  return time_total + time_sub_left + time_sub_right;
 }
 
 void free_tree(Node_t *root){

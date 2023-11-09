@@ -6,24 +6,24 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct Node{
-  size_t value;
-  size_t price_left,price_right;
-  struct Node *left,*right;
+  int idx;
+  int value,number_boxes;
+  int price_left,price_right;
+  struct Node *left,*right,*parent;
 }Node_t;
 
-Node_t* create(size_t value);
-Node_t* createTree(size_t n,size_t topology[][3]);
+Node_t* create(int value);
 
+bool isPlaceOK(Node_t *root);
+int calculateWeight(Node_t *node);
+int calculateTime(Node_t *node);
 
-void preorderTraversal(Node_t* root);
-void postorderTraversal(Node_t* root);
-void inorderTraversal(Node_t* root);
-
-_Bool isBoxIn(Node_t *root);
-void placeBox(Node_t *root, size_t value);
-void removeBox(Node_t *root,size_t value);
+bool isBoxIn(Node_t *root);
+void placeBox(Node_t *root, int value);
+void removeBox(Node_t *root,int value);
 
 void free_tree(Node_t* root);
 
