@@ -21,13 +21,6 @@ typedef struct Result{
  *
  */
 
- void printPP(Node_t *root){
-  if(root==NULL)return;
-  printPP(root->left);
-  printPP(root->right);
-  printf("idx%d:pocet%d:hodnota%d -> ",root->idx,root->number_boxes,root->value);
-}
-
 void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes[], int *weight, int *time);
 
 int weight=INT_MAX,price=INT_MAX;
@@ -47,33 +40,24 @@ int main(void){
 
   Node_t *nodes[N];
   for(int i=0;i<N;++i)
-    nodes[i]=create(i);
+    nodes[i]=create();
   
   for(int i=0;i<N-1;++i){
     int parent,child,price;
     parent=topology[i][0];
     child=topology[i][1];
     price=topology[i][2];
-    if(nodes[parent]->left == NULL){
+    if(nodes[parent]->left == NULL)
       nodes[parent]->left=nodes[child];
-      nodes[parent]->price_left=price;
-    }else{
+    else
       nodes[parent]->right=nodes[child];
-      nodes[parent]->price_right=price;
-    }
+    
     nodes[child]->parent=nodes[parent];
+    nodes[child]->price=price+nodes[parent]->price;
     
   }
-  
+
   int time=INT_MAX, weight=INT_MAX;
-/*
-  placeBox(nodes[3], 1);
-  for(int i=0;i<N;++i){
-    int idk=isPlaceOK(nodes[i]);
-    printf(" uzel%d %d",i,idk);
-    printf(" pocet boxu:%d\n",nodes[i]->number_boxes);
-  }
-*/
   
   run(0,B,boxes,N,nodes,&weight,&time);
   printf("%d %d\n",weight,time);
@@ -85,18 +69,13 @@ int main(void){
 void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes[], int *weight, int *time){
   if(box_idx >= B){
     int local_weight=calculateWeight(nodes[0]);
-    int local_time=calculateTime(nodes[0]);
+    int local_time=0;
+    calculateTime(nodes[0],&local_time);
     
     if((local_weight < *weight) || (local_weight == *weight && local_time < *time)){
       *weight=local_weight;
       *time=local_time;
     }
-    /*
-    if(local_weight==40){
-      printPP(nodes[0]);
-      printf("\n");
-    }
-    */
     return;
   }
 
