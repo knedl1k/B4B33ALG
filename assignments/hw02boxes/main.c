@@ -61,17 +61,23 @@ int main(void){
       nodes[parent]->right=nodes[child];
       nodes[parent]->price_right=price;
     }
-    if(i!=0)
-      nodes[child]->parent=nodes[parent];
+    nodes[child]->parent=nodes[parent];
     
   }
-
+  
   int time=INT_MAX, weight=INT_MAX;
-
+/*
+  placeBox(nodes[3], 1);
+  for(int i=0;i<N;++i){
+    int idk=isPlaceOK(nodes[i]);
+    printf(" uzel%d %d",i,idk);
+    printf(" pocet boxu:%d\n",nodes[i]->number_boxes);
+  }
+*/
+  
   run(0,B,boxes,N,nodes,&weight,&time);
-
   printf("%d %d\n",weight,time);
-
+  
   free_tree(nodes[0]);
 	return 0;
 }
@@ -85,10 +91,12 @@ void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes
       *weight=local_weight;
       *time=local_time;
     }
+    /*
     if(local_weight==40){
       printPP(nodes[0]);
       printf("\n");
     }
+    */
     return;
   }
 

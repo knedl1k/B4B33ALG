@@ -11,6 +11,7 @@
 typedef struct Node{
   int idx;
   int value,number_boxes;
+  int price;
   int price_left,price_right;
   struct Node *left,*right,*parent;
 }Node_t;
