@@ -63,14 +63,14 @@ int calculateWeight(Node_t *node){
   return left_diff+right_diff;
 }
 
-void calculateTime(Node_t *node, int *time){
-  if(node==NULL) return;
-  calculateTime(node->left,time);
-  calculateTime(node->right,time);
-  *time+=node->price * node->number_boxes;
+int calculateTime(Node_t *node){
+  if(node==NULL) return 0;
+  int leftTime=calculateTime(node->left);
+  int rightTime=calculateTime(node->right);
+  return leftTime+rightTime+(node->price*node->number_boxes);
 }
 
-void free_tree(Node_t *root){
+void free_tree(Node_t *root){ //postorder free
   if(root==NULL) return;
   free_tree(root->left);
   free_tree(root->right);

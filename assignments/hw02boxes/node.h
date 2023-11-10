@@ -21,7 +21,7 @@ void removeBox(Node_t *root,int value);
 
 bool isPlaceOK(Node_t *root);
 int calculateWeight(Node_t *node);
-void calculateTime(Node_t *node, int *time);
+int calculateTime(Node_t *node);
 
 void free_tree(Node_t* root);
 

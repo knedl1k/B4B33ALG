@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS+=-std=c17 -Wall -Wextra -pedantic -g -lm -O3 -Wunused-variable #-Werror
-LFLAGS+=-lpthread
+CFLAGS+=-std=c17 -Wall -Wextra -pedantic -O3 #-g -lm  -Wunused-variable #-Werror
+#LFLAGS+=-lpthread
 CFILES=main.c node.c node.h
 ARCHIVE=hw02
 

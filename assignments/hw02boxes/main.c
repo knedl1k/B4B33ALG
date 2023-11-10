@@ -8,24 +8,15 @@
 
 #include "node.h"
 
-typedef struct Result{
-  int time;
-  int weight;
-}Result_t;
-
 /*
  * N .. number of rooms, N>=2
  * B .. number of boxes, B<=15
  * boxes[] .. weight of boxes in order they are stored
- *
- *
  */
 
 void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes[], int *weight, int *time);
 
-int weight=INT_MAX,price=INT_MAX;
 int main(void){
-  
   int N,B;
   scanf("%d %d",&N,&B);
 
@@ -37,12 +28,11 @@ int main(void){
   for(int i=0;i<N-1;++i)
     scanf("%d %d %d",&topology[i][0],&topology[i][1],&topology[i][2]);
   
-
   Node_t *nodes[N];
-  for(int i=0;i<N;++i)
+  for(int i=0;i<N;++i) //creates rooms
     nodes[i]=create();
   
-  for(int i=0;i<N-1;++i){
+  for(int i=0;i<N-1;++i){ //creates connections between rooms
     int parent,child,price;
     parent=topology[i][0];
     child=topology[i][1];
@@ -51,26 +41,22 @@ int main(void){
       nodes[parent]->left=nodes[child];
     else
       nodes[parent]->right=nodes[child];
-    
     nodes[child]->parent=nodes[parent];
     nodes[child]->price=price+nodes[parent]->price;
-    
   }
 
   int time=INT_MAX, weight=INT_MAX;
-  
   run(0,B,boxes,N,nodes,&weight,&time);
   printf("%d %d\n",weight,time);
   
   free_tree(nodes[0]);
-	return 0;
+  return 0;
 }
 
 void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes[], int *weight, int *time){
-  if(box_idx >= B){
+  if(box_idx==B){
     int local_weight=calculateWeight(nodes[0]);
-    int local_time=0;
-    calculateTime(nodes[0],&local_time);
+    int local_time=calculateTime(nodes[0]);
     
     if((local_weight < *weight) || (local_weight == *weight && local_time < *time)){
       *weight=local_weight;
@@ -80,12 +66,10 @@ void run(int box_idx, const int B, const int boxes[], const int N, Node_t *nodes
   }
 
   for(int i=0;i<N;++i){
-    if(isPlaceOK(nodes[i])){
-      placeBox(nodes[i], boxes[box_idx]);
-      run(box_idx+1,B,boxes,N,nodes,weight,time);
-      removeBox(nodes[i], boxes[box_idx]);
-    }
+    if(! isPlaceOK(nodes[i])) 
+      continue;
+    placeBox(nodes[i], boxes[box_idx]);
+    run(box_idx+1,B,boxes,N,nodes,weight,time);
+    removeBox(nodes[i], boxes[box_idx]);
   }
-
 }
-
