@@ -11,14 +11,12 @@
 typedef struct Node{
   size_t value;
   size_t left_depth,right_depth;
-  struct Node *left,*right,*parent;
+  struct Node *left,*right;
 }Node_t;
 
 Node_t* create(void);
-void createTree(size_t N,Node_t *nodes,size_t *values);
-
-int calculateWeight(Node_t *node);
-int calculateTime(Node_t *node);
+void createTree(const size_t N,Node_t *root, const size_t *values);
+void calculateDepth(Node_t *root);
 
 void free_tree(Node_t* root);
 
