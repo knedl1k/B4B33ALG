@@ -9,17 +9,14 @@
 #include <stdbool.h>
 
 typedef struct Node{
-  int value,number_boxes;
-  int price;
+  size_t value;
+  size_t left_depth,right_depth;
   struct Node *left,*right,*parent;
 }Node_t;
 
-Node_t* create();
+Node_t* create(void);
+void createTree(size_t N,Node_t *nodes,size_t *values);
 
-void placeBox(Node_t *root, int value);
-void removeBox(Node_t *root,int value);
-
-bool isPlaceOK(Node_t *root);
 int calculateWeight(Node_t *node);
 int calculateTime(Node_t *node);
 
