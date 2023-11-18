@@ -1,18 +1,11 @@
-  // GNU General Public License v3.0
-  // @knedl1k
+// GNU General Public License v3.0
+// @knedl1k
 
-  #include <stdio.h>
-  #include <stdint.h>
-  #include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 
-  #include "node.h"
-
-  void pPrint(Node_t* root) {
-  if(root==NULL)return;
-  pPrint(root->left);
-  pPrint(root->right);
-  printf("%zu-> hl L:%zu hl P:%zu\n", root->value,root->left_depth,root->right_depth);
-}
+#include "node.h"
 
 int main(void){
   size_t N;
@@ -27,8 +20,7 @@ int main(void){
   free(values);
 
   calculateDepth(root);
-  pPrint(root);
-
+  printf("%zu\n",root->speed_rail);
   free_tree(root);
   return EXIT_SUCCESS;
 }

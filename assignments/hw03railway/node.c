@@ -9,6 +9,7 @@
 Node_t* create(void){
   Node_t *new_node=(Node_t *)malloc(sizeof(Node_t));
   new_node->value=0;
+  new_node->speed_rail=1;
   new_node->right_depth=new_node->left_depth=0;
   new_node->left=new_node->right=NULL;
   return new_node;
@@ -18,7 +19,7 @@ void calculateDepth(Node_t *root){
   if(root==NULL)return;
   calculateDepth(root->left);  
   calculateDepth(root->right);
-    
+  size_t left=1,right=1;
   if(root->left){
     root->left_depth=1+(root->left->left_depth > root->left->right_depth ? 
     root->left->left_depth : root->left->right_depth);
@@ -27,6 +28,12 @@ void calculateDepth(Node_t *root){
     root->right_depth=1+(root->right->left_depth > root->right->right_depth ? 
     root->right->left_depth : root->right->right_depth);
   }
+
+  if(root->left)
+    left=root->left->speed_rail + root->right_depth +1;
+  if(root->right)
+    right=root->right->speed_rail + root->left_depth +1;
+  root->speed_rail=(left< right)? right : left;
 }
 
 static void placeValue(Node_t *root,const size_t value){
