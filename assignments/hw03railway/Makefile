@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS+=-std=c17 -Wall -Wextra -pedantic -O3 -g # -lm  -Wunused-variable #-Werror
 #LFLAGS+=-lpthread
-CFILES=main.c
+CFILES=main.c node.c node.h
 ARCHIVE=hw03
 
 all: compile
