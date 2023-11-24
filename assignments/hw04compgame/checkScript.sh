@@ -10,7 +10,7 @@ for i in {1..10}; do
    expected_output_file="test_data/pub${i}.out"
    actual_output_file="pub${i}.actual.out"
 
-   ./main < "$input_file" > "$actual_output_file" 2>&1
+   ./compgame < "$input_file" > "$actual_output_file" 2>&1
 
    diff_output=$(diff "$actual_output_file" "$expected_output_file")
 

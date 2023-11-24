@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-size_t setCap=1000;
-
 typedef struct{
   int x,y;
   int color;
@@ -17,16 +15,9 @@ typedef struct{
 
 typedef struct{
   status_t *data;
-  size_t size;
-}set_t;
-
-typedef struct{
-  status_t *data;
   int front,rear;
   int capacity;
 }queue_t;
-
-void board_alloc(int M, int N, int (**arr_ptr)[M][N]);
 
 void initQueue(queue_t *q);
 bool isEmpty(queue_t q);
@@ -34,21 +25,19 @@ void enqueue(queue_t *q,status_t item);
 status_t dequeue(queue_t *q);
 void free_queue(queue_t *q);
 
-bool isInSet(set_t *set,status_t element);
-bool addToSet(set_t *set,status_t element);
-void initializeSet(set_t *set);
+bool **all_sets(size_t M, size_t N);
+void free_sets(size_t M, size_t C, bool ***sets);
+int bfs(size_t M,size_t N, int (*board)[N], size_t C);
 
-int bfs(int M,int N, int (*board)[N], int C);
-
-void pPrint(int M,int N,int (*board)[N]);
+void pPrint(size_t M,size_t N,int (*board)[N]);
 
 int dx[4]={0,1,0,-1};
 int dy[4]={-1,0,1,0};
 
 int main(void){
-  int M,N;
-  int C;
-  scanf("%d %d %d",&M,&N,&C);
+  size_t M,N;
+  size_t C;
+  scanf("%zu %zu %zu",&M,&N,&C);
 
   int (*board)[N]=malloc(M*sizeof(*board));
 
@@ -56,7 +45,6 @@ int main(void){
     for(size_t j=0;j<N;++j)
       scanf("%d",&board[i][j]);
   
-
   int b=bfs(M,N,board, C);
   
   printf("%d\n",b);
@@ -64,23 +52,20 @@ int main(void){
 	return EXIT_SUCCESS;
 }
 
-void board_alloc(int M, int N, int (**arr_ptr)[M][N]){
-  *arr_ptr=malloc( sizeof(**arr_ptr) +1 );
-  //assert(*arr_ptr!=NULL);
-}
-
-int bfs(int M,int N,int (*board)[N], int C){
+int bfs(size_t M,size_t N,int (*board)[N], size_t C){
   int shortest_path=-1;
   queue_t q;
   initQueue(&q);
-  set_t my_set;
-  initializeSet(&my_set);
+  bool ***sets=malloc(sizeof(bool**)*(C+1));
+  for(size_t i=0;i<C+1;++i)
+    sets[i]=all_sets(M, N);
+  
   status_t root={.x=M-1,.y=0,.color=0,.lenght=0};
-  addToSet(&my_set, root);
   enqueue(&q, root);
+  sets[root.color][root.x][root.y]=true;
+
   while(! isEmpty(q)){
     status_t v=dequeue(&q);
-    
     if(v.x==0 && v.y==N-1){ //got to the end
       shortest_path=v.lenght;
       break;
@@ -90,14 +75,33 @@ int bfs(int M,int N,int (*board)[N], int C){
       int y=v.y + dy[i];
       if(x>=0 && x<M && y>=0 && y<N && (board[x][y]== v.color || board[x][y]<=0)){
         status_t element={.x=x, .y=y, .color=(board[x][y]<0)? abs(board[x][y]) : v.color, .lenght=v.lenght+1};
-        if(addToSet(&my_set, element))
+        if(! sets[element.color][x][y]){
           enqueue(&q, element);
+          sets[element.color][x][y]=true;
+        }
       }
     }
   }
-  free(my_set.data);
   free_queue(&q);
+  free_sets(M, C, sets);
   return shortest_path;
+}
+
+bool **all_sets(size_t M, size_t N){
+  bool **set=calloc(sizeof(bool*),M);
+  for(size_t i=0;i<M;++i){
+    set[i]=calloc(sizeof(bool),N);
+  }
+  return set;
+}
+
+void free_sets(size_t M, size_t C, bool ***sets){
+  for(size_t i=0;i<C+1;++i){
+    for(size_t j=0;j<M;++j)
+      free(sets[i][j]);
+    free(sets[i]);
+  }
+  free(sets);
 }
 
 bool isEmpty(queue_t q){
@@ -139,46 +143,4 @@ void free_queue(queue_t *q){
 	q->rear=0;
 	q->capacity=0;
 	q->data=NULL;
-}
-
-void initializeSet(set_t *set){
-  set->data=malloc(sizeof(status_t)*setCap);
-  set->size=0;
-}
-
-bool addToSet(set_t *set,status_t element){
-  for(size_t i=0; i<set->size; ++i){
-    if(set->data[i].x==element.x && set->data[i].y==element.y && set->data[i].color==element.color)
-      return false;
-  }
-  if(set->size==setCap){
-    status_t *tmp=realloc(set->data,sizeof(status_t)*setCap*2);
-    /*
-    if(tmp==NULL){
-      free(set);
-      exit(200);
-    }
-    */
-    set->data=tmp;
-    setCap*=2;
-  }
-  set->data[set->size]=element;
-  set->size++;
-
-  return true;
-}
-
-bool isInSet(set_t *set,status_t element){
-  for(size_t i=0;i<setCap;++i)
-    if(set->data[i].x==element.x && set->data[i].y==element.y && set->data[i].color==element.color)
-      return false;
-  return true;
-}
-
-void pPrint(int M,int N,int (*board)[N]){
-  for(size_t i=0;i<M;++i){
-    for(size_t j=0;j<N;++j)
-      printf("%d ",board[i][j]);
-    printf("\n");
-  }
 }

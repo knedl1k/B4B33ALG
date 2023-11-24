@@ -1,6 +1,6 @@
 PROJECT=hw04compgame
 CC=gcc
-CFLAGS+=-std=c17 -Wall -Wextra -pedantic -O3 -g # -lm  -Wunused-variable #-Werror
+CFLAGS+=-std=c17 -Wall -O3 -Wextra -pedantic  -g # -lm  -Wunused-variable #-Werror
 LFLAGS+=#-lpthread
 PROGRAM=compgame
 
