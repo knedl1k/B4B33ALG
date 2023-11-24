@@ -26,7 +26,7 @@ typedef struct{
   int capacity;
 }queue_t;
 
-
+void board_alloc(int M, int N, int (**arr_ptr)[M][N]);
 
 void initQueue(queue_t *q);
 bool isEmpty(queue_t q);
@@ -38,24 +38,20 @@ bool isInSet(set_t *set,status_t element);
 bool addToSet(set_t *set,status_t element);
 void initializeSet(set_t *set);
 
-int bfs(int M,int N,int board[M][N], int C);
+int bfs(int M,int N, int (*board)[N], int C);
 
-void pPrint(int M,int N,int board[M][N]);
+void pPrint(int M,int N,int (*board)[N]);
 
 int dx[4]={0,1,0,-1};
 int dy[4]={-1,0,1,0};
 
 int main(void){
-  set_t my_set;
-  initializeSet(&my_set);
-
-  queue_t queue;
-  initQueue(&queue);
-  
   int M,N;
   int C;
   scanf("%d %d %d",&M,&N,&C);
-  int board[M][N];
+
+  int (*board)[N]=malloc(M*sizeof(*board));
+
   for(size_t i=0;i<M;++i)
     for(size_t j=0;j<N;++j)
       scanf("%d",&board[i][j]);
@@ -64,11 +60,16 @@ int main(void){
   int b=bfs(M,N,board, C);
   
   printf("%d\n",b);
-
+  free(board);
 	return EXIT_SUCCESS;
 }
 
-int bfs(int M,int N,int board[M][N], int C){
+void board_alloc(int M, int N, int (**arr_ptr)[M][N]){
+  *arr_ptr=malloc( sizeof(**arr_ptr) +1 );
+  //assert(*arr_ptr!=NULL);
+}
+
+int bfs(int M,int N,int (*board)[N], int C){
   int shortest_path=-1;
   queue_t q;
   initQueue(&q);
@@ -81,29 +82,21 @@ int bfs(int M,int N,int board[M][N], int C){
     status_t v=dequeue(&q);
     
     if(v.x==0 && v.y==N-1){ //got to the end
-      //printf("%d %d %d\n",v.x,v.y,v.color);
       shortest_path=v.lenght;
       break;
     }
     for(size_t i=0; i<4;++i){
       int x=v.x + dx[i];
       int y=v.y + dy[i];
-      //printf("%d %d %d\n",x>=0 && x<M,y>=0 && y<N,(board[x][y]== v.color || board[x][y]<=0));
-      //printf("barvy: %d %d\n",board[x][y],v.color);
       if(x>=0 && x<M && y>=0 && y<N && (board[x][y]== v.color || board[x][y]<=0)){
         status_t element={.x=x, .y=y, .color=(board[x][y]<0)? abs(board[x][y]) : v.color, .lenght=v.lenght+1};
-        //printf("jsem zde\n");
-        if(addToSet(&my_set, element)){
+        if(addToSet(&my_set, element))
           enqueue(&q, element);
-          //printf("queue:%d %d %d\n",x,y,element.color);
-          
-        }
       }
     }
   }
   free(my_set.data);
   free_queue(&q);
-
   return shortest_path;
 }
 
@@ -182,7 +175,7 @@ bool isInSet(set_t *set,status_t element){
   return true;
 }
 
-void pPrint(int M,int N,int board[M][N]){
+void pPrint(int M,int N,int (*board)[N]){
   for(size_t i=0;i<M;++i){
     for(size_t j=0;j<N;++j)
       printf("%d ",board[i][j]);
