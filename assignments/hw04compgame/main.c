@@ -19,17 +19,16 @@ typedef struct{
   int capacity;
 }queue_t;
 
-void initQueue(queue_t *q);
-bool isEmpty(queue_t q);
 void enqueue(queue_t *q,status_t item);
 status_t dequeue(queue_t *q);
+bool isEmpty(queue_t q);
+void initQueue(queue_t *q);
 void free_queue(queue_t *q);
 
-bool **all_sets(size_t M, size_t N);
-void free_sets(size_t M, size_t C, bool ***sets);
-int bfs(size_t M,size_t N, int (*board)[N], size_t C);
+bool **all_sets(size_t M,size_t N);
+void free_sets(size_t M,size_t C,bool ***sets);
 
-void pPrint(size_t M,size_t N,int (*board)[N]);
+int bfs(size_t M,size_t N,int (*board)[N],size_t C);
 
 int dx[4]={0,1,0,-1};
 int dy[4]={-1,0,1,0};
@@ -45,23 +44,23 @@ int main(void){
     for(size_t j=0;j<N;++j)
       scanf("%d",&board[i][j]);
   
-  int b=bfs(M,N,board, C);
+  int b=bfs(M,N,board,C);
   
   printf("%d\n",b);
   free(board);
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
-int bfs(size_t M,size_t N,int (*board)[N], size_t C){
+int bfs(size_t M,size_t N,int (*board)[N],size_t C){
   int shortest_path=-1;
   queue_t q;
   initQueue(&q);
   bool ***sets=malloc(sizeof(bool**)*(C+1));
   for(size_t i=0;i<C+1;++i)
-    sets[i]=all_sets(M, N);
+    sets[i]=all_sets(M,N);
   
   status_t root={.x=M-1,.y=0,.color=0,.lenght=0};
-  enqueue(&q, root);
+  enqueue(&q,root);
   sets[root.color][root.x][root.y]=true;
 
   while(! isEmpty(q)){
@@ -74,20 +73,20 @@ int bfs(size_t M,size_t N,int (*board)[N], size_t C){
       int x=v.x + dx[i];
       int y=v.y + dy[i];
       if(x>=0 && x<M && y>=0 && y<N && (board[x][y]== v.color || board[x][y]<=0)){
-        status_t element={.x=x, .y=y, .color=(board[x][y]<0)? abs(board[x][y]) : v.color, .lenght=v.lenght+1};
+        status_t element={.x=x,.y=y,.color=(board[x][y]<0)? abs(board[x][y]) : v.color,.lenght=v.lenght+1};
         if(! sets[element.color][x][y]){
-          enqueue(&q, element);
+          enqueue(&q,element);
           sets[element.color][x][y]=true;
         }
       }
     }
   }
   free_queue(&q);
-  free_sets(M, C, sets);
+  free_sets(M,C,sets);
   return shortest_path;
 }
 
-bool **all_sets(size_t M, size_t N){
+bool **all_sets(size_t M,size_t N){
   bool **set=calloc(sizeof(bool*),M);
   for(size_t i=0;i<M;++i){
     set[i]=calloc(sizeof(bool),N);
@@ -95,17 +94,13 @@ bool **all_sets(size_t M, size_t N){
   return set;
 }
 
-void free_sets(size_t M, size_t C, bool ***sets){
+void free_sets(size_t M,size_t C,bool ***sets){
   for(size_t i=0;i<C+1;++i){
     for(size_t j=0;j<M;++j)
       free(sets[i][j]);
     free(sets[i]);
   }
   free(sets);
-}
-
-bool isEmpty(queue_t q){
-  return q.front == -1;
 }
 
 void enqueue(queue_t *q,status_t item){
@@ -131,6 +126,10 @@ status_t dequeue(queue_t *q){
   return item;
 }
 
+bool isEmpty(queue_t q){
+  return q.front == -1;
+}
+
 void initQueue(queue_t *q){
   q->front=q->rear=-1;
   q->capacity=20;
@@ -138,9 +137,9 @@ void initQueue(queue_t *q){
 }
 
 void free_queue(queue_t *q){
-	free(q->data);
-	q->front=0;
-	q->rear=0;
-	q->capacity=0;
-	q->data=NULL;
+  free(q->data);
+  q->front=0;
+  q->rear=0;
+  q->capacity=0;
+  q->data=NULL;
 }
