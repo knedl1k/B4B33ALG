@@ -107,7 +107,7 @@ nahrazených perfektně vyváženým stromem během provádění na vstupu speci
 <tbody><tr valign="top">
 <td align="left" width="300">
 
-    <b>Vstup</b><br>
+ <b>Vstup</b><br>
 <pre>2 11
 I 90
 I 95
@@ -157,7 +157,7 @@ a), resp. b), resp. c), resp. d). Uzly původních holých větví jsou ve všec
 <tbody><tr valign="top">
 <td align="left" width="300">
 
-    <b>Vstup</b><br>
+<b>Vstup</b><br>
 <pre>2 15
 I 10
 I 5
