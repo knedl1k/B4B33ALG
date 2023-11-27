@@ -57,9 +57,7 @@ Neformálně řečeno, holá větev nemusí být rovná, v různých uzlech mů�
 
 &nbsp; 
 &nbsp; <table border="0" width="800" align="center"><tbody><tr><td align="center">
-<!--img style="width: 60%; height: 60%;" src="img1.png"-->
 <img style="width: 60%; height: 60%;" src="img1.png"><br><br>
-<!--img style="width: 480px;" src="getdata.php?task=barebranchesBST&item=examples.png"--><br>
 
 
 <b>Obrázek 1.</b> Vznik dvou holých větví délky 2<sup><i>K</i></sup>&minus;1 po smazání uzlu <i>d</i>.
@@ -135,8 +133,7 @@ D 60
   </td><td>
 
 </td><td align="center">
-<img style="width: 70%; height: 70%;" src="getdata.php?task=barebranchesBST&item=img21.png">
-<!--img style="width: 364px; height: 150px;" src="img2.png" /-->
+<img style="width: 70%; height: 70%;" src="img21.png">
 <br><br>
 
 <b>Obrázek 2.1.</b> 
@@ -190,8 +187,7 @@ D 90
 
 </td><td align="center">
 <br><br><br>
-<img style="width: 70%; height: 70%;" src="getdata.php?task=barebranchesBST&item=img22.png">
-<!--img style="width: 364px; height: 150px;" src="img2.png" /-->
+<img style="width: 70%; height: 70%;" src="img22.png">
 <br><br>
 
 <b>Obrázek 2.2.</b>
