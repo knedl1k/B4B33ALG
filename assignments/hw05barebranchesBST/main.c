@@ -5,10 +5,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 typedef struct{
   char op;
-  size_t key;
+  int key;
 }action_t;
 
 typedef struct{
@@ -17,39 +18,201 @@ typedef struct{
   int cap;
 }queue_t;
 
-void loadInput(queue_t *q, size_t N);
+typedef struct node_t{
+  int key;
+  struct node_t *left,*right;
+  int height;
+}node_t;
 
-void enqueue(queue_t *q,action_t item);
+static void loadInput(queue_t *q,const size_t N);
+
+void enqueue(queue_t *q,const action_t item);
 action_t dequeue(queue_t *q);
-bool isEmpty(queue_t q);
-void initQueue(queue_t *q,size_t cap);
-void free_queue(queue_t *q);
+static bool isEmpty(queue_t q);
+void initQueue(queue_t *q,const size_t cap);
+void freeQueue(queue_t *q);
+
+node_t* createNode(size_t key);
+node_t* rightRotate(node_t  *y);
+node_t* leftRotate(node_t  *x); 
+node_t* insertNode(node_t *node,int key,int max_height);
+node_t* removeNode(node_t* root,int key,int max_height);
+node_t* minValueNode(node_t* node);
+
+void freeTree(node_t *root);
+
+static void pPrint(node_t *root);
+static int height(node_t *node);
+static int max(int a,int b);
+static int getBalance(node_t *node);
+
+size_t changes=0;
 
 int main(void){
-  size_t K=0, N=0;
+  size_t K=0,N=0;
   scanf("%zu %zu",&K,&N);
   queue_t queue;
   initQueue(&queue,N);
-  loadInput(&queue, N);
-  
+  loadInput(&queue,N);
+  int max_height=pow(2,K)-1;
+  printf("nechci:%d\n",max_height);
+  node_t *root=NULL;
+  for(size_t i=0;i<N;++i){
+    action_t action=dequeue(&queue);
+    if(action.op=='I')
+      root=insertNode(root,action.key,max_height);
+    else
+      root=removeNode(root,action.key,max_height);
+  }
 
+  pPrint(root);
 
-  free_queue(&queue);
+  freeQueue(&queue);
+  freeTree(root);
+
+  printf("\n%zu\n",changes);
   return 0;
 }
 
-
-
-void loadInput(queue_t *q, size_t N){
-  for(size_t i=0;i<N;++i){
-    action_t action;
-    scanf(" %c %zu",&action.op, &action.key);
-    enqueue(q, action);
+node_t* insertNode(node_t *node,int key,int max_height){ 
+  if (node == NULL) 
+    return(createNode(key)); 
+  
+  if (key<node->key) 
+    node->left =insertNode(node->left,key,max_height); 
+  else if (key>node->key) 
+    node->right=insertNode(node->right,key,max_height); 
+  else //Equal keys are not allowed in BST 
+    return node; 
+  
+  node->height=1+max(height(node->left),height(node->right)); 
+  int balance=getBalance(node); 
+  
+  // Left Left Case 
+  if (balance>max_height && key<node->left->key)
+    return rightRotate(node); 
+  
+  // Right Right Case 
+  if (balance<-max_height && key>node->right->key) 
+    return leftRotate(node); 
+  
+  // Left Right Case 
+  if (balance>max_height && key>node->left->key){ 
+    node->left= leftRotate(node->left); 
+    return rightRotate(node); 
   }
+  
+  // Right Left Case 
+  if (balance<-max_height && key<node->right->key){ 
+    node->right=rightRotate(node->right); 
+    return leftRotate(node); 
+  }
+  
+  return node; 
+}
+
+node_t *rightRotate(node_t *y){ 
+  node_t *x=y->left; 
+  node_t *T2=x->right; 
+  x->right=y; 
+  y->left=T2; 
+  y->height=max(height(y->left),height(y->right))+1; 
+  x->height=max(height(x->left),height(x->right))+1; 
+  changes++;
+  return x; 
+}
+
+node_t *leftRotate(node_t *x){ 
+  node_t *y=x->right; 
+  node_t *T2=y->left; 
+  y->left=x; 
+  x->right=T2; 
+  x->height=max(height(x->left),height(x->right))+1; 
+  y->height=max(height(y->left),height(y->right))+1; 
+  changes++;
+  return y; 
+}
+
+node_t* removeNode(node_t* root,int key,int max_height){
+  if (root == NULL)
+    return root;
+ 
+  if (key<root->key)
+    root->left=removeNode(root->left,key,max_height);
+ 
+  else if(key>root->key)
+    root->right=removeNode(root->right,key,max_height);
+ 
+  // if key is same as root's key,then This is
+  // the node to be deleted
+  else{
+    // node with only one child or no child
+    if((root->left == NULL) || (root->right == NULL)){
+      node_t *temp=root->left ? root->left :root->right;
+      // No child case
+      if (temp == NULL){
+        temp=root;
+        root=NULL;
+      }else // One child case
+        *root=*temp; // Copy the contents of
+      // the non-empty child
+      free(temp);
+      }else{
+        // node with two children: Get the inorder
+        // successor (smallest in the right subtree)
+        node_t* temp=minValueNode(root->right);
+        // Copy the inorder successor's data to this node
+        root->key=temp->key;
+        // Delete the inorder successor
+        root->right=removeNode(root->right,temp->key,max_height);
+      }
+  }
+
+  // If the tree had only one node then return
+  if (root == NULL)
+    return root;
+ 
+  root->height=1+max(height(root->left),height(root->right));
+ 
+  // STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to
+  // check whether this node became unbalanced)
+  int balance=getBalance(root);
+ 
+  // Left Left Case
+  if (balance>max_height && getBalance(root->left) >= 0)
+    return rightRotate(root);
+ 
+  // Left Right Case
+  if (balance>max_height && getBalance(root->left)<0){
+    root->left= leftRotate(root->left);
+    return rightRotate(root);
+  }
+ 
+  // Right Right Case
+  if (balance<-max_height && getBalance(root->right) <= 0)
+    return leftRotate(root);
+ 
+  // Right Left Case
+  if (balance<-max_height && getBalance(root->right)>0){
+    root->right=rightRotate(root->right);
+    return leftRotate(root);
+  }
+ 
+  return root;
+}
+
+node_t* minValueNode(node_t* node){
+  node_t* current=node;
+  while(current->left != NULL)
+    current=current->left;
+  return current;
+}
+
+static void loadInput(queue_t *q,size_t N){
   for(size_t i=0;i<N;++i){
     action_t action;
-    action=dequeue(q);
-    printf("%c %zu\n",action.op,action.key);
+    scanf(" %c %d",&action.op,&action.key);
+    enqueue(q,action);
   }
 }
 
@@ -78,7 +241,7 @@ action_t dequeue(queue_t *q){
   return item;
 }
 
-bool isEmpty(queue_t q){
+static bool isEmpty(queue_t q){
   return q.front==-1;
 }
 
@@ -88,10 +251,47 @@ void initQueue(queue_t *q,size_t cap){
   q->data=malloc(sizeof(queue_t) *cap);
 }
 
-void free_queue(queue_t *q){
+void freeQueue(queue_t *q){
   free(q->data);
   q->front=0;
   q->rear=0;
   q->cap=0;
   q->data=NULL;
+}
+
+static int height(node_t *node){
+  if(node==NULL) return 0;
+  return node->height;
+}
+
+static int max(int a,int b){
+  return (a>b)? a:b;
+}
+
+static int getBalance(node_t *node){
+  if(node==NULL) return 0;
+  return height(node->left)-height(node->right);
+}
+
+node_t* createNode(size_t key){
+  node_t *new_node=malloc(sizeof(node_t));
+  new_node->key=key;
+  new_node->left=new_node->right=NULL;
+  new_node->height=1;
+  return new_node;
+}
+
+static void pPrint(node_t *root){ //preorder print
+  if(root==NULL)return;
+  printf("%d ",root->key);
+  pPrint(root->left);
+  pPrint(root->right);
+  
+}
+
+void freeTree(node_t *root){ //postorder free
+  if(root==NULL)return;
+  freeTree(root->left);
+  freeTree(root->right);
+  free(root);
 }
