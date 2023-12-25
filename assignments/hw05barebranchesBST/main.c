@@ -1,5 +1,5 @@
-// GNU General Public License v3.0
-// @knedl1k
+//GNU General Public License v3.0
+//@knedl1k
 
 #include <stdio.h>
 #include <stdint.h>
@@ -59,8 +59,12 @@ int main(void){
   node_t *root=NULL;
   for(size_t i=0;i<N;++i){
     action_t action=dequeue(&queue);
-    if(action.op=='I')
+    if(action.op=='I'){
+      printf("I\n");
       root=insertNode(root,action.key,max_height);
+
+    }
+      
     else
       root=removeNode(root,action.key,max_height);
   }
@@ -75,35 +79,43 @@ int main(void){
 }
 
 node_t* insertNode(node_t *node,int key,int max_height){ 
-  if (node == NULL) 
+  if(node==NULL) 
     return(createNode(key)); 
   
-  if (key<node->key) 
+  if(key<node->key) 
     node->left =insertNode(node->left,key,max_height); 
-  else if (key>node->key) 
+  else if(key>node->key) 
     node->right=insertNode(node->right,key,max_height); 
   else //Equal keys are not allowed in BST 
     return node; 
   
   node->height=1+max(height(node->left),height(node->right)); 
   int balance=getBalance(node); 
+  //printf("I balance: %d\n",balance);
   
-  // Left Left Case 
-  if (balance>max_height && key<node->left->key)
+  //Left Left Case 
+  if(balance>max_height && key<node->left->key){
+    printf("rotuju LL\n");
     return rightRotate(node); 
+  }
   
-  // Right Right Case 
-  if (balance<-max_height && key>node->right->key) 
+  //Right Right Case 
+  if(balance<-max_height && key>node->right->key){
+    printf("rotuju RR\n");
+    printf("problem %d u %d\n",balance, node->key);
     return leftRotate(node); 
+  }
   
-  // Left Right Case 
-  if (balance>max_height && key>node->left->key){ 
+  //Left Right Case 
+  if(balance>max_height && key>node->left->key){ 
+    printf("rotuju LR\n");
     node->left= leftRotate(node->left); 
     return rightRotate(node); 
   }
   
-  // Right Left Case 
-  if (balance<-max_height && key<node->right->key){ 
+  //Right Left Case 
+  if(balance<-max_height && key<node->right->key){ 
+    printf("rotuju RL\n");
     node->right=rightRotate(node->right); 
     return leftRotate(node); 
   }
@@ -134,66 +146,65 @@ node_t *leftRotate(node_t *x){
 }
 
 node_t* removeNode(node_t* root,int key,int max_height){
-  if (root == NULL)
-    return root;
+  if(root==NULL) return root;
  
-  if (key<root->key)
+  if(key<root->key)
     root->left=removeNode(root->left,key,max_height);
- 
   else if(key>root->key)
     root->right=removeNode(root->right,key,max_height);
- 
-  // if key is same as root's key,then This is
-  // the node to be deleted
   else{
-    // node with only one child or no child
-    if((root->left == NULL) || (root->right == NULL)){
-      node_t *temp=root->left ? root->left :root->right;
-      // No child case
-      if (temp == NULL){
+    //node with only one child or no child
+    if((root->left==NULL) || (root->right==NULL)){
+      node_t *temp=(root->left)? root->left :root->right;
+      if(temp==NULL){ //No child case
         temp=root;
         root=NULL;
-      }else // One child case
-        *root=*temp; // Copy the contents of
-      // the non-empty child
+      }else //One child case
+        *root=*temp; //Copy the contents of
+      //the non-empty child
       free(temp);
       }else{
-        // node with two children: Get the inorder
-        // successor (smallest in the right subtree)
+        //node with two children: Get the inorder
+        //successor (smallest in the right subtree)
         node_t* temp=minValueNode(root->right);
-        // Copy the inorder successor's data to this node
+        //Copy the inorder successor's data to this node
         root->key=temp->key;
-        // Delete the inorder successor
+        //Delete the inorder successor
         root->right=removeNode(root->right,temp->key,max_height);
       }
   }
 
-  // If the tree had only one node then return
-  if (root == NULL)
+  //If the tree had only one node then return
+  if(root==NULL)
     return root;
  
   root->height=1+max(height(root->left),height(root->right));
- 
-  // STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to
-  // check whether this node became unbalanced)
   int balance=getBalance(root);
+  //printf("R balance: %d\n",balance);
  
-  // Left Left Case
-  if (balance>max_height && getBalance(root->left) >= 0)
+  //Left Left Case
+  if(balance>max_height && getBalance(root->left) >= 0){
+    printf("rotuju LL\n");
     return rightRotate(root);
- 
-  // Left Right Case
-  if (balance>max_height && getBalance(root->left)<0){
+  }
+  //Left Right Case
+  if(balance>max_height && getBalance(root->left)<0){
+    printf("rotuju LR\n");
     root->left= leftRotate(root->left);
     return rightRotate(root);
   }
  
-  // Right Right Case
-  if (balance<-max_height && getBalance(root->right) <= 0)
+  //Right Right Case
+  if(balance<-max_height && getBalance(root->right) <= 0){
+    printf("rotuju RR\n");
+    printf("problem u %d\n",root->key);
     return leftRotate(root);
+  }
+    
  
-  // Right Left Case
-  if (balance<-max_height && getBalance(root->right)>0){
+  //Right Left Case
+  if(balance<-max_height && getBalance(root->right)>0){
+    printf("rotuju LR\n");
     root->right=rightRotate(root->right);
     return leftRotate(root);
   }
@@ -221,7 +232,7 @@ void enqueue(queue_t *q,action_t item){
     q->front=q->rear=0;
   else{
     /*
-    if(q->rear == q->cap-1){
+    if(q->rear==q->cap-1){
       action_t *tmp=realloc(q->data,sizeof(action_t)*q->cap*2);
       q->data=tmp;
       q->cap*=2;
@@ -234,7 +245,7 @@ void enqueue(queue_t *q,action_t item){
 
 action_t dequeue(queue_t *q){
   action_t item=q->data[q->front];
-  if(q->front == q->rear)
+  if(q->front==q->rear)
     q->front=q->rear=-1;
   else
     q->front++;
@@ -270,6 +281,7 @@ static int max(int a,int b){
 
 static int getBalance(node_t *node){
   if(node==NULL) return 0;
+  printf("%d: L%d R%d\n",node->key,height(node->left),height(node->right));
   return height(node->left)-height(node->right);
 }
 
